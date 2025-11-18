@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兰心慧诊：基于多模态知识的女性肿瘤辅助诊断系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #8B4789;
+            --secondary-color: #D8BFD8;
+            --accent-color: #9370DB;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .navbar-custom {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: white;
+            min-height: calc(100vh - 56px);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 20px;
+            margin: 5px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn-primary-custom {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 25px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary-custom:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            padding: 12px 18px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            max-width: 70%;
+        }
+
+        .chat-message.user {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-message.assistant {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .module-card {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .module-card:hover {
+            box-shadow: 0 8px 25px rgba(139, 71, 137, 0.3);
+        }
+
+        /* 新式疾病问诊样式 */
+        .consultation-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .consultation-icon-large {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .consultation-header h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .consultation-chat-wrapper {
+            margin-top: 20px;
+        }
+
+        .chat-messages-new {
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .chat-messages-new .chat-message {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            max-width: 85%;
+            line-height: 1.6;
+        }
+
+        .chat-messages-new .chat-message.assistant {
+            background: #e9ecef;
+            color: #333;
+            margin-right: auto;
+        }
+
+        .chat-messages-new .chat-message.user {
+            background: linear-gradient(135deg, #8B4789 0%, #9370DB 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .modern-input-wrapper {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .input-prefix-area {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .input-prefix-area i.bi-stars {
+            font-size: 18px;
+        }
+
+        .input-main-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        .input-main-area input {
+            flex: 1;
+            font-size: 15px;
+        }
+
+        .input-main-area input::placeholder {
+            color: #adb5bd;
+        }
+
+        .input-actions-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-icon-only {
+            background: none;
+            border: none;
+            color: #6c757d;
+            padding: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .btn-icon-only:hover {
+            color: var(--primary-color);
+        }
+
+        .btn-send-modern {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            transition: transform 0.2s;
+        }
+
+        .btn-send-modern:hover {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .btn-send-modern i {
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-heart-pulse-fill me-2"></i>
+                兰心慧诊
+            </a>
+            <span class="navbar-text text-white">
+                基于多模态知识的女性肿瘤辅助诊断系统
+            </span>
+            <div class="ms-auto">
+                <button class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-person-circle me-1"></i>医生工作站
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 左侧边栏 -->
+            <div class="col-md-2 sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#" data-section="home">
+                        <i class="bi bi-house-door me-2"></i>首页
+                    </a>
+                    <a class="nav-link" href="#" data-section="consultation">
+                        <i class="bi bi-chat-dots me-2"></i>疾病问诊
+                    </a>
+                    <a class="nav-link" href="#" data-section="diagnosis">
+                        <i class="bi bi-clipboard2-pulse me-2"></i>智能诊断
+                    </a>
+                    <a class="nav-link" href="#" data-section="prognosis">
+                        <i class="bi bi-graph-up-arrow me-2"></i>预后预测
+                    </a>
+                    <a class="nav-link" href="#" data-section="medical-record">
+                        <i class="bi bi-file-earmark-medical me-2"></i>病历生成
+                    </a>
+                    <a class="nav-link" href="#" data-section="qa">
+                        <i class="bi bi-question-circle me-2"></i>智能问答
+                    </a>
+                    <a class="nav-link" href="#" data-section="research">
+                        <i class="bi bi-book me-2"></i>科研教学
+                    </a>
+                    <a class="nav-link" href="#" data-section="evidence">
+                        <i class="bi bi-journal-medical me-2"></i>循证决策
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="col-md-10 p-4">
+                <!-- 首页 -->
+                <div id="home-section" class="content-section">
+                    <h2 class="mb-4">欢迎使用兰心慧诊系统</h2>
+
+                    <div class="row g-4">
+                        <!-- 智慧服务板块 -->
+                        <div class="col-md-4">
+                            <div class="card card-custom module-card" data-module="consultation">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="bi bi-chat-heart"></i>
+                                    </div>
+                                    <h5>疾病问诊</h5>
+                                    <p class="text-muted">智能导诊、症状采集、风险评估</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom module-card" data-module="diagnosis">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="bi bi-clipboard2-pulse"></i>
+                                    </div>
+                                    <h5>智能诊断</h5>
+                                    <p class="text-muted">多模态数据整合、鉴别诊断</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom module-card" data-module="prognosis">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="bi bi-graph-up"></i>
+                                    </div>
+                                    <h5>预后预测</h5>
+                                    <p class="text-muted">生存预测、复发风险评估</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom module-card" data-module="medical-record">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="bi bi-file-earmark-medical"></i>
+                                    </div>
+                                    <h5>病历生成</h5>
+                                    <p class="text-muted">智能信息提取、专科病历</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom module-card" data-module="research">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="bi bi-book"></i>
+                                    </div>
+                                    <h5>科研教学</h5>
+                                    <p class="text-muted">临床研究、教学案例库</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom module-card" data-module="evidence">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="bi bi-journal-medical"></i>
+                                    </div>
+                                    <h5>循证决策</h5>
+                                    <p class="text-muted">最新临床证据、指南推荐</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 疾病问诊 -->
+                <div id="consultation-section" class="content-section" style="display:none;">
+                    <div class="consultation-wrapper">
+                        <!-- 顶部标题区 -->
+                        <div class="consultation-header mb-4">
+                            <div class="d-flex align-items-start">
+                                <div class="consultation-icon-large">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <h3 class="mb-2">你好，我是女性肿瘤辅助诊断助手</h3>
+                                    <p class="text-muted mb-0">主要面向宫颈癌、卵巢癌、子宫内膜癌，患者输入症状和检查结果，AI自动分析诊断、推荐治疗方案。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 对话区域 -->
+                        <div class="consultation-chat-wrapper">
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-light border-0 py-3">
+                                    <h6 class="mb-0 text-secondary">智能导诊与风险对话</h6>
+                                </div>
+                                <div class="card-body p-4" style="background: #f8f9fa;">
+                                    <div id="chat-container" class="chat-messages-new">
+                                        <div class="chat-message assistant">
+                                            您好，我是兰心慧诊智能助手。请描述您的症状，我将为您提供专业的导诊建议。
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 新式输入区域 -->
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-3">
+                                    <div class="modern-input-wrapper">
+                                        <div class="input-prefix-area">
+                                            <i class="bi bi-stars text-primary"></i>
+                                            <span class="ms-2 text-muted small">女性肿瘤诊断助手</span>
+                                            <i class="bi bi-chevron-down ms-1 text-muted small"></i>
+                                        </div>
+                                        <div class="input-main-area">
+                                            <input type="text" class="form-control border-0 shadow-none" id="chat-input"
+                                                placeholder="给 女性肿瘤辅助诊断助手 发送消息">
+                                            <div class="input-actions-area">
+                                                <button class="btn btn-sm btn-icon-only" title="语音输入">
+                                                    <i class="bi bi-mic"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-icon-only" title="上传文件">
+                                                    <i class="bi bi-paperclip"></i>
+                                                </button>
+                                                <button class="btn btn-primary rounded-circle btn-send-modern"
+                                                    id="send-chat">
+                                                    <i class="bi bi-arrow-up"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <small class="text-muted">内容由 AI 生成，请仔细甄别</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 隐藏原来的右侧栏 -->
+                    <div class="row d-none">
+                        <div class="col-md-8"></div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom mb-3">
+                                <div class="card-header bg-white">
+                                    <h6 class="mb-0">结构化症状采集</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">肿瘤类型</label>
+                                        <select class="form-select" id="tumor-type-select">
+                                            <option value="宫颈癌">宫颈癌</option>
+                                            <option value="卵巢癌">卵巢癌</option>
+                                            <option value="子宫内膜癌">子宫内膜癌</option>
+                                            <option value="乳腺癌">乳腺癌</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-primary-custom btn-sm w-100" id="load-symptoms">
+                                        加载症状清单
+                                    </button>
+                                    <div id="symptom-checklist" class="mt-3"></div>
+                                </div>
+                            </div>
+
+                            <div class="card card-custom">
+                                <div class="card-header bg-white">
+                                    <h6 class="mb-0">危险因素评估</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="risk-assessment-result">
+                                        <p class="text-muted">请先完成症状采集</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 智能诊断 -->
+                <div id="diagnosis-section" class="content-section" style="display:none;">
+                    <h2 class="mb-4">智能诊断核心</h2>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-custom mb-3">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">多模态数据整合</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">文本特征提取</label>
+                                        <textarea class="form-control" rows="3" placeholder="输入病历文本..."></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">影像特征提取</label>
+                                        <input type="file" class="form-control" accept="image/*">
+                                        <small class="text-muted">支持CT、MRI等医学影像</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">病理特征提取</label>
+                                        <input type="file" class="form-control" accept="image/*">
+                                    </div>
+                                    <button class="btn btn-primary-custom">
+                                        <i class="bi bi-cpu"></i> 开始分析
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card card-custom mb-3">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">鉴别诊断系统</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="differential-diagnosis-result">
+                                        <p class="text-muted">等待数据分析...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card card-custom">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">分期评估系统</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="staging-result">
+                                        <p class="text-muted">等待诊断结果...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预后预测 -->
+                <div id="prognosis-section" class="content-section" style="display:none;">
+                    <h2 class="mb-4">预后预测</h2>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card card-custom mb-3">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">精准风险分层</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="prognosis-form">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">肿瘤类型</label>
+                                                    <select class="form-select" name="tumor_type">
+                                                        <option value="宫颈癌">宫颈癌</option>
+                                                        <option value="卵巢癌">卵巢癌</option>
+                                                        <option value="子宫内膜癌">子宫内膜癌</option>
+                                                        <option value="乳腺癌">乳腺癌</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">分期</label>
+                                                    <select class="form-select" name="stage">
+                                                        <option value="I">I期</option>
+                                                        <option value="II">II期</option>
+                                                        <option value="III">III期</option>
+                                                        <option value="IV">IV期</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">年龄</label>
+                                                    <input type="number" class="form-control" name="age"
+                                                        placeholder="输入年龄">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary-custom" id="predict-prognosis">
+                                            <i class="bi bi-graph-up"></i> 生成预后预测
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card card-custom">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">生存预测模型</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="survival-prediction-result">
+                                        <p class="text-muted">请先输入患者信息</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card card-custom">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">复发风险评估</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="recurrence-risk-result">
+                                        <p class="text-muted">请先输入患者信息</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 病历生成 -->
+                <div id="medical-record-section" class="content-section" style="display:none;">
+                    <h2 class="mb-4">病历生成</h2>
+
+                    <div class="card card-custom">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">智能信息提取与病历生成</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>输入患者信息</h6>
+                                    <form id="medical-record-form">
+                                        <div class="mb-3">
+                                            <label class="form-label">患者姓名</label>
+                                            <input type="text" class="form-control" name="name">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">年龄</label>
+                                            <input type="number" class="form-control" name="age">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">主诉</label>
+                                            <textarea class="form-control" name="chief_complaint" rows="2"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">现病史</label>
+                                            <textarea class="form-control" name="present_illness" rows="4"></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-primary-custom" id="generate-record">
+                                            <i class="bi bi-file-earmark-plus"></i> 生成病历
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>生成的病历</h6>
+                                    <div id="generated-record" class="border rounded p-3"
+                                        style="min-height: 400px; background: #f8f9fa;">
+                                        <p class="text-muted">病历将在此显示...</p>
+                                    </div>
+                                    <button class="btn btn-outline-primary mt-2" id="export-record">
+                                        <i class="bi bi-download"></i> 导出病历
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 智能问答 -->
+                <div id="qa-section" class="content-section" style="display:none;">
+                    <h2 class="mb-4">智能问答</h2>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card card-custom">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">专业问题解答</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="qa-chat-container" style="height: 500px; overflow-y: auto;">
+                                        <div class="chat-message assistant">
+                                            您好！我可以回答关于女性肿瘤的专业问题，包括诊断、治疗、预后等方面。
+                                        </div>
+                                    </div>
+                                    <div class="input-group mt-3">
+                                        <input type="text" class="form-control" id="qa-input" placeholder="请输入您的问题...">
+                                        <button class="btn btn-primary-custom" id="send-qa">
+                                            <i class="bi bi-send"></i> 提问
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom">
+                                <div class="card-header bg-white">
+                                    <h6 class="mb-0">常见问题</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group">
+                                        <a href="#" class="list-group-item list-group-item-action qa-quick-question">
+                                            宫颈癌的早期症状有哪些？
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action qa-quick-question">
+                                            HPV疫苗接种建议
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action qa-quick-question">
+                                            卵巢癌的筛查方法
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action qa-quick-question">
+                                            乳腺癌的治疗方案
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 科研教学 -->
+                <div id="research-section" class="content-section" style="display:none;">
+                    <h2 class="mb-4">科研与教学支持</h2>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card card-custom mb-3">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-clipboard-data"
+                                        style="font-size: 3rem; color: var(--primary-color);"></i>
+                                    <h5 class="mt-3">临床研究支持</h5>
+                                    <p class="text-muted">数据分析、统计方法推荐</p>
+                                    <button class="btn btn-primary-custom btn-sm">进入</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom mb-3">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-journal-text"
+                                        style="font-size: 3rem; color: var(--primary-color);"></i>
+                                    <h5 class="mt-3">教学案例库</h5>
+                                    <p class="text-muted">典型病例、教学要点</p>
+                                    <button class="btn btn-primary-custom btn-sm">进入</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-custom mb-3">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-mortarboard"
+                                        style="font-size: 3rem; color: var(--primary-color);"></i>
+                                    <h5 class="mt-3">继续教育平台</h5>
+                                    <p class="text-muted">在线课程、学分认证</p>
+                                    <button class="btn btn-primary-custom btn-sm">进入</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 循证决策 -->
+                <div id="evidence-section" class="content-section" style="display:none;">
+                    <h2 class="mb-4">循证决策支持</h2>
+
+                    <div class="card card-custom">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">最新临床证据与指南</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>临床指南</h6>
+                                    <div class="list-group">
+                                        <div class="list-group-item">
+                                            <h6 class="mb-1">NCCN宫颈癌临床实践指南 2025</h6>
+                                            <p class="mb-1 text-muted">最新版本，包含筛查、诊断、治疗建议</p>
+                                            <small>更新时间: 2025-01-15</small>
+                                        </div>
+                                        <div class="list-group-item">
+                                            <h6 class="mb-1">CSCO卵巢癌诊疗指南 2025</h6>
+                                            <p class="mb-1 text-muted">中国临床肿瘤学会权威指南</p>
+                                            <small>更新时间: 2025-02-01</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <h6>最新研究</h6>
+                                    <div class="list-group">
+                                        <div class="list-group-item">
+                                            <h6 class="mb-1">免疫治疗在宫颈癌中的应用</h6>
+                                            <p class="mb-1 text-muted">PD-1抑制剂联合化疗显著改善预后</p>
+                                            <small>来源: NEJM 2025</small>
+                                        </div>
+                                        <div class="list-group-item">
+                                            <h6 class="mb-1">PARP抑制剂维持治疗</h6>
+                                            <p class="mb-1 text-muted">BRCA突变卵巢癌患者获益明显</p>
+                                            <small>来源: Lancet 2025</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/lanxin.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能医疗问诊系统</title>
+    <!-- 引入外部样式表 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar">
+                <div class="p-3">
+                    <button class="btn btn-primary w-100 mb-3" id="new-conversation">
+                        <i class="bi bi-plus-circle me-2"></i>新建会话
+                    </button>
+                    <div class="list-group conversations-list animate__animated">
+                        <!-- 会话列表将在这里动态添加 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主要内容区域 -->
+            <div class="col-md-9 col-lg-10 px-0">
+                <!-- 顶部导航 -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                    <div class="container-fluid">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="pill" href="#chat">
+                                    <i class="bi bi-chat-dots me-2"></i>智能问诊
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="pill" href="#treatment">
+                                    <i class="bi bi-file-medical me-2"></i>治疗推荐
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="pill" href="#knowledge">
+                                    <i class="bi bi-book me-2"></i>知识查询
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="pill" href="#records">
+                                    <i class="bi bi-file-earmark-plus me-2"></i>电子病历
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="pill" href="#reports">
+                                    <i class="bi bi-file-earmark-text me-2"></i>医疗报告
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- 内容区域 -->
+                <div class="tab-content p-3">
+                    <!-- 智能问诊 -->
+                    <div class="tab-pane fade show active" id="chat">
+                        <div class="chat-container" id="chat-container">
+                            <!-- 消息将在这里动态添加 -->
+                        </div>
+
+                        <!-- 输入区域 -->
+                        <div class="input-group mt-3">
+                            <input type="text" class="form-control" id="user-input" placeholder="请输入您的问题...">
+                            <button class="btn btn-primary" type="button" id="send-button">
+                                <i class="bi bi-send me-2"></i>发送
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 治疗推荐 -->
+                    <div class="tab-pane fade" id="treatment">
+                        <div class="p-4">
+<h4>治疗方案推荐</h4>
+                            <p>根据患者症状和检查结果，系统将自动生成个性化治疗方案推荐。</p>
+
+                            <div class="card mt-4">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="card-title mb-0">AI辅助治疗方案生成</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="treatment-form">
+                                        <div class="mb-3">
+                                            <label for="diagnosis-input" class="form-label">诊断结果</label>
+                                            <input type="text" class="form-control" id="diagnosis-input" placeholder="输入诊断结果...">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="symptoms-input" class="form-label">主要症状</label>
+                                            <textarea class="form-control" id="symptoms-input" rows="3" placeholder="输入患者主要症状..."></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="patient-details" class="form-label">患者信息</label>
+                                            <textarea class="form-control" id="patient-details" rows="2" placeholder="年龄、性别、过敏史等..."></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-primary" id="generate-treatment-btn">
+                                            <i class="bi bi-magic me-2"></i>生成治疗方案
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div id="treatment-result" class="mt-4"></div>
+                        </div>
+                    </div>
+
+                    <!-- 知识查询 -->
+                    <div class="tab-pane fade" id="knowledge">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="card-title mb-0">医学知识库查询</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="knowledge-search" class="form-label">搜索疾病或症状</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="knowledge-search" placeholder="输入关键词...">
+                                                <button class="btn btn-primary" type="button" id="knowledge-search-btn">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">常见疾病</label>
+                                            <div id="common-diseases" class="d-flex flex-wrap">
+                                                <div class="spinner-border text-primary" role="status"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div id="knowledge-results" class="knowledge-results">
+                                    <div class="text-center p-5">
+                                        <i class="bi bi-search" style="font-size: 3rem;"></i>
+                                        <p class="mt-3">输入关键词搜索医学知识库</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 电子病历 -->
+                    <div class="tab-pane fade" id="records">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="card-title mb-0">患者管理</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="search-patient" placeholder="搜索患者...">
+                                                <button class="btn btn-outline-secondary" type="button">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <button class="btn btn-primary w-100 mb-3" id="new-patient-btn">
+                                            <i class="bi bi-person-plus me-2"></i>新增患者
+                                        </button>
+
+                                        <div id="patients-list" class="patients-list">
+                                            <div class="spinner-border text-primary" role="status"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div id="records-container" class="records-container">
+                                    <div class="text-center p-5">
+                                        <i class="bi bi-person-badge" style="font-size: 3rem;"></i>
+                                        <p class="mt-3">选择或创建患者以管理电子病历</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 医疗报告 -->
+                    <div class="tab-pane fade" id="reports">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4>医疗报告管理</h4>
+                            <button class="btn btn-primary" id="generate-report-button">
+                                <i class="bi bi-file-earmark-plus me-2"></i>生成新报告
+                            </button>
+                        </div>
+
+                        <div id="reports-container"></div>
+
+                        <div id="reports-list" class="mt-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入脚本 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
